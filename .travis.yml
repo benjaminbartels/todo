@@ -13,7 +13,7 @@ install:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - curl -L https://releases.hashicorp.com/terraform/0.12.4/terraform_0.12.4_linux_amd64.zip > ./terraform.zip
-  - unzip terraform.zip ./terraform
+  - unzip terraform.zip
   - chmod +x ./terraform
   - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./terragrunt
   - chmod +x ./terragrunt
