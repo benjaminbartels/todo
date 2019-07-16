@@ -22,7 +22,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-	- sls deploy --verbose
+  - sls deploy --verbose
 
 
 after_script:
