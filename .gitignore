@@ -1,8 +1,7 @@
-## Go
+## GoLang
 
 # Binaries for programs and plugins
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
@@ -12,6 +11,16 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+## Ignore Extentionless Files
+*
+!*.*
+!*/
+
+# Code Coverage
+.cover
+
+# Extentionless binaries in cmd directories
 
 ## Terraform
 
