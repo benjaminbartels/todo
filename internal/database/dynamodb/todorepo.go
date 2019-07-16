@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/benjaminbartels/todo/internal"
 	"github.com/pkg/errors"
@@ -15,12 +16,12 @@ const todosTableName = "todos"
 
 // ToDoRepo represents a boltdb repository for managing todos
 type ToDoRepo struct {
-	db *dynamodb.DynamoDB
+	db dynamodbiface.DynamoDBAPI
 }
 
 // NewToDoRepo returns a new ToDo repository using the given bolt database. It also creates the ToDos
 // bucket if it is not yet created on disk.
-func NewToDoRepo(db *dynamodb.DynamoDB) *ToDoRepo {
+func NewToDoRepo(db dynamodbiface.DynamoDBAPI) *ToDoRepo {
 	return &ToDoRepo{db}
 }
 
