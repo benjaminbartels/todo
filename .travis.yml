@@ -9,14 +9,16 @@ go:
   - 1.12
 
 install:
+  - mkdir bin
+  - export PATH="$PATH:/bin"
   - go get github.com/axw/gocov/gocov
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - curl -L https://releases.hashicorp.com/terraform/0.12.4/terraform_0.12.4_linux_amd64.zip > ./terraform.zip
-  - unzip terraform.zip
-  - chmod +x ./terraform
-  - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./terragrunt
-  - chmod +x ./terragrunt
+  - unzip terraform.zip -d /bin
+  - chmod +x ./bin/terraform
+  - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./bin/terragrunt
+  - chmod +x ./bin/terragrunt
   - npm install -g serverless
 
 before_script:
