@@ -3,7 +3,7 @@ terraform {
 }
 
 inputs = {
-  name           = "todo"
+  name           = "todos"
   read_capacity  = 5
   write_capacity = 5
   aws_region     = "us-west-2"
