@@ -27,12 +27,12 @@ before_script:
 script:
   - go test -coverprofile c.out ./...
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
-  - ./terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
-  - ./terragrunt plan --terragrunt-working-dir infrastructure/terraform/dynamodb
-  - ./terragrunt apply --terragrunt-working-dir infrastructure/terraform/dynamodb
-  - ./terragrunt get --terragrunt-working-dir infrastructure/terraform/iam
-  - ./terragrunt plan --terragrunt-working-dir infrastructure/terraform/iam
-  - ./terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
+  - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
+  - terragrunt plan --terragrunt-working-dir infrastructure/terraform/dynamodb
+  - terragrunt apply --terragrunt-working-dir infrastructure/terraform/dynamodb
+  - terragrunt get --terragrunt-working-dir infrastructure/terraform/iam
+  - terragrunt plan --terragrunt-working-dir infrastructure/terraform/iam
+  - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
   - sls deploy --verbose
 
 after_script:
