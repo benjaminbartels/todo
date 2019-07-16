@@ -1,11 +1,14 @@
 package dynamodb
 
 import (
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/benjaminbartels/todo/internal"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 )
 
 const todosTableName = "todos"
@@ -33,14 +36,18 @@ func (r *ToDoRepo) Get(id string) (*internal.ToDo, error) {
 		return nil, errors.Wrapf(err, "Could not get ToDo %s from database", id)
 	}
 
-	var todo *internal.ToDo
+	t := &internal.ToDo{}
 
-	err = dynamodbattribute.UnmarshalMap(result.Item, todo)
+	err = dynamodbattribute.UnmarshalMap(result.Item, t)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not unmarshal ToDo %s", id)
 	}
 
-	return todo, nil
+	if t.ID == "" {
+		return nil, nil
+	}
+
+	return t, nil
 }
 
 // GetAll returns all ToDos
@@ -52,35 +59,41 @@ func (r *ToDoRepo) GetAll() ([]internal.ToDo, error) {
 
 	result, err := r.db.Scan(input)
 	if err != nil {
-		return nil, errors.Wrap(err, "Could not ToDos from database")
+		return nil, errors.Wrap(err, "Could not get ToDos from database")
 	}
 
-	todos := []internal.ToDo{}
+	t := []internal.ToDo{}
 
 	// Unmarshal the Items field in the result value to the Item Go type.
-	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &todos)
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &t)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not unmarshal ToDos")
 	}
 
-	return todos, nil
+	return t, nil
 }
 
 // Save creates or updates a ToDo
 func (r *ToDoRepo) Save(todo *internal.ToDo) error {
 
-	b, err := dynamodbattribute.MarshalMap(todo)
+	if todo.ID == "" {
+		todo.ID = uuid.NewV4().String()
+	}
+
+	todo.ModTime = time.Now()
+
+	t, err := dynamodbattribute.MarshalMap(todo)
 	if err != nil {
-		return errors.Wrap(err, "Could not marshal ToDo")
+		return errors.Wrapf(err, "Could not unmarshal ToDo %s", todo.ID)
 	}
 
 	input := &dynamodb.PutItemInput{
 		TableName: aws.String(todosTableName),
-		Item:      b,
+		Item:      t,
 	}
 
 	if _, err := r.db.PutItem(input); err != nil {
-		return errors.Wrap(err, "Could not put ToDo")
+		return errors.Wrapf(err, "Could not save ToDo %s to database", todo.ID)
 	}
 
 	return nil
@@ -95,7 +108,7 @@ func (r *ToDoRepo) Delete(id string) error {
 	}
 
 	if _, err := r.db.DeleteItem(input); err != nil {
-		return errors.Wrapf(err, "Could not delete ToDo %s", id)
+		return errors.Wrapf(err, "Could not delete ToDo %s to database", id)
 	}
 
 	return nil
