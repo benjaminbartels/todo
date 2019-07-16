@@ -1,5 +1,5 @@
 terraform {
-  source = "git::git@github.com:benjaminbartels/terraform-modules.git//lambda-dynamodb-iam-role"
+  source = "github.com/benjaminbartels/terraform-modules.git//lambda-dynamodb-iam-role"
 }
 
 inputs = {

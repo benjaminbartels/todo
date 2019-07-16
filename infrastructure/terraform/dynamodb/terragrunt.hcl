@@ -1,5 +1,5 @@
 terraform {
-  source = "git::git@github.com:benjaminbartels/terraform-modules.git//dynamodb"
+  source = "github.com/benjaminbartels/terraform-modules.git//dynamodb"
 }
 
 inputs = {
