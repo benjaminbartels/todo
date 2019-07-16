@@ -1,6 +1,7 @@
 package dynamodb_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -13,16 +14,20 @@ import (
 
 var testUUID = "a8a43435-20d8-4af2-8f94-f504aff2c6f3"
 
-func TesGetOne(t *testing.T) {
-	t.Run("GetToDoFound", testToDoFound)
-	t.Run("GetToDoNotFound", testToDoNotFound)
+func TestToDoRepo(t *testing.T) {
+	t.Run("GetToDoFound", testGetToDoFound)
+	t.Run("GetToDoNotFound", testGetToDoNotFound)
+	t.Run("GetToDoError", testGetToDoError)
 	t.Run("GetAllToDos", testGetAllToDos)
+	t.Run("GetAllToDosError", testGetAllToDosError)
 	t.Run("CreateToDo", testCreateToDo)
+	t.Run("CreateToDoError", testCreateToDoError)
 	t.Run("UpdateToDo", testUpdateToDo)
 	t.Run("DeleteToDo", testDeleteToDo)
+	t.Run("DeleteToDoError", testDeleteToDoError)
 }
 
-func testToDoFound(t *testing.T) {
+func testGetToDoFound(t *testing.T) {
 
 	m := &dynamodb.DynamoDBClientMock{}
 
@@ -63,7 +68,7 @@ func testToDoFound(t *testing.T) {
 
 }
 
-func testToDoNotFound(t *testing.T) {
+func testGetToDoNotFound(t *testing.T) {
 
 	m := &dynamodb.DynamoDBClientMock{}
 
@@ -82,6 +87,27 @@ func testToDoNotFound(t *testing.T) {
 
 	if toDo != nil {
 		t.Fatal("Expected ToDo to be nil")
+	}
+
+	if !m.GetItemInvoked {
+		t.Fatal("GetItem not invoked")
+	}
+
+}
+
+func testGetToDoError(t *testing.T) {
+
+	m := &dynamodb.DynamoDBClientMock{}
+
+	m.GetItemFn = func(*awsdynamodb.GetItemInput) (*awsdynamodb.GetItemOutput, error) {
+		return nil, errors.New("DB Error")
+	}
+
+	repo := dynamodb.NewToDoRepo(m)
+
+	_, err := repo.Get(testUUID)
+	if err == nil {
+		t.Fatal("Expected Error")
 	}
 
 	if !m.GetItemInvoked {
@@ -148,6 +174,27 @@ func testGetAllToDos(t *testing.T) {
 	}
 }
 
+func testGetAllToDosError(t *testing.T) {
+
+	m := &dynamodb.DynamoDBClientMock{}
+
+	m.ScanFn = func(*awsdynamodb.ScanInput) (*awsdynamodb.ScanOutput, error) {
+		return nil, errors.New("DB Error")
+	}
+
+	repo := dynamodb.NewToDoRepo(m)
+
+	_, err := repo.GetAll()
+	if err == nil {
+		t.Fatal("Expected Error")
+	}
+
+	if !m.ScanInvoked {
+		t.Fatal("Scan not invoked")
+	}
+
+}
+
 func testCreateToDo(t *testing.T) {
 
 	m := &dynamodb.DynamoDBClientMock{}
@@ -192,6 +239,29 @@ func testCreateToDo(t *testing.T) {
 	if !m.PutItemInvoked {
 		t.Fatal("PutItem not invoked")
 	}
+}
+
+func testCreateToDoError(t *testing.T) {
+
+	m := &dynamodb.DynamoDBClientMock{}
+
+	m.PutItemFn = func(*awsdynamodb.PutItemInput) (*awsdynamodb.PutItemOutput, error) {
+		return nil, errors.New("DB Error")
+	}
+
+	repo := dynamodb.NewToDoRepo(m)
+
+	newToDo := &internal.ToDo{Title: "New ToDo"}
+
+	err := repo.Save(newToDo)
+	if err == nil {
+		t.Fatal("Expected Error")
+	}
+
+	if !m.PutItemInvoked {
+		t.Fatal("PuItem not invoked")
+	}
+
 }
 
 func testUpdateToDo(t *testing.T) {
@@ -279,6 +349,26 @@ func testDeleteToDo(t *testing.T) {
 	}
 
 	if !m.DeleteItemInvoked {
-		t.Fatal("PutItem not invoked")
+		t.Fatal("DeleteItem not invoked")
+	}
+}
+
+func testDeleteToDoError(t *testing.T) {
+
+	m := &dynamodb.DynamoDBClientMock{}
+
+	m.DeleteItemFn = func(input *awsdynamodb.DeleteItemInput) (*awsdynamodb.DeleteItemOutput, error) {
+		return nil, errors.New("DB Error")
+	}
+
+	repo := dynamodb.NewToDoRepo(m)
+
+	err := repo.Delete(testUUID)
+	if err == nil {
+		t.Fatal("Expected Error")
+	}
+
+	if !m.DeleteItemInvoked {
+		t.Fatal("DeleteItem not invoked")
 	}
 }

@@ -19,6 +19,7 @@
 
 # Code Coverage
 .cover
+cover.html
 
 # Extentionless binaries in cmd directories
 
