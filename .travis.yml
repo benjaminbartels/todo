@@ -3,8 +3,7 @@ sudo: required
 language: go
 
 env:
-  - GO111MODULE=on
-  - CC_TEST_REPORTER_ID=320c3b1aa2b0d201eff445e9b79e52b188b9c9816a783fd41b85da1af8bb6f29
+  - GO111MODULE=on CC_TEST_REPORTER_ID=320c3b1aa2b0d201eff445e9b79e52b188b9c9816a783fd41b85da1af8bb6f29
 
 go:
   - 1.12
