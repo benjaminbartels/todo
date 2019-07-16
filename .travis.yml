@@ -3,11 +3,8 @@ sudo: required
 language: go
 
 env:
-  global:
-    CC_TEST_REPORTER_ID: 320c3b1aa2b0d201eff445e9b79e52b188b9c9816a783fd41b85da1af8bb6f29
-
-env:
   - GO111MODULE=on
+  - CC_TEST_REPORTER_ID=320c3b1aa2b0d201eff445e9b79e52b188b9c9816a783fd41b85da1af8bb6f29
 
 go:
   - 1.12
@@ -16,6 +13,11 @@ install:
   - go get github.com/axw/gocov/gocov
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
+  # - curl -L https://releases.hashicorp.com/terraform/0.12.4/terraform_0.12.4_linux_amd64.zip > ./terraform.zip
+  # - unzip terraform.zip ./terraform
+  # - chmod +x ./terraform
+  # - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./terragrunt
+  # - chmod +x ./terragrunt
   - npm install -g serverless
 
 before_script:
@@ -24,6 +26,12 @@ before_script:
 script:
   - go test -coverprofile c.out ./...
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
+  # - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
+  # - terragrunt plan --terragrunt-working-dir infrastructure/terraform/dynamodb
+  # - terragrunt apply --terragrunt-working-dir infrastructure/terraform/dynamodb
+  # - terragrunt get --terragrunt-working-dir infrastructure/terraform/iam
+  # - terragrunt plan --terragrunt-working-dir infrastructure/terraform/iam
+  # - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
   - sls deploy --verbose
 
 after_script:
