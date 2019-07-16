@@ -20,6 +20,7 @@ install:
 
 before_script:
   - ./cc-test-reporter before-build
+  - go test -coverprofile c.out ./...
 
 script:
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
