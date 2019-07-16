@@ -1,0 +1,36 @@
+sudo: required
+
+language: go
+
+env:
+  global:
+    CC_TEST_REPORTER_ID: 320c3b1aa2b0d201eff445e9b79e52b188b9c9816a783fd41b85da1af8bb6f29
+
+services:
+  - docker
+
+go:
+  - 1.12
+
+install:
+  - go get github.com/axw/gocov/gocov
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - npm install -g serverless
+
+before_script:
+  - ./cc-test-reporter before-build
+
+script:
+	- sls deploy --verbose
+
+
+after_script:
+  - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push benjaminbartels/zymsrv;
+    docker push benjaminbartels/fermmon;
+    fi
