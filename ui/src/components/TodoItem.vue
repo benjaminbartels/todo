@@ -2,36 +2,26 @@
   <v-list-tile class="todo-item" :class="{ 'editing': editing }">
     <v-list-tile-action>
       <v-checkbox
-        :input-value="todo.done"
+        :input-value="todo.completed"
         @change="toggleTodo(todo)"
         color="primary"
         v-if="!editing"
       ></v-checkbox>
-      <v-icon
-        color="primary"
-        v-else
-      >edit</v-icon>
+      <v-icon color="primary" v-else>edit</v-icon>
     </v-list-tile-action>
     <template v-if="!editing">
       <v-list-tile-content
-        :class="{ 'primary--text': todo.done }"
+        :class="{ 'primary--text': todo.completed }"
         @dblclick="editing = true"
-      >
-        {{ todo.text }}
-      </v-list-tile-content>
+      >{{ todo.title }}</v-list-tile-content>
       <v-list-tile-action>
-        <v-btn
-          @click="removeTodo(todo)"
-          color="red lighten-3"
-          flat
-          icon
-        >
+        <v-btn @click="removeTodo(todo)" color="red lighten-3" flat icon>
           <v-icon>close</v-icon>
         </v-btn>
       </v-list-tile-action>
     </template>
     <v-text-field
-      :value="todo.text"
+      :value="todo.title"
       @blur="doneEdit"
       @keyup.enter="doneEdit"
       @keyup.esc="cancelEdit"
@@ -94,11 +84,15 @@ export default {
 </script>
 
 <style lang="stylus">
-.todo-item
-  .v-list__tile
-    height: auto
-    padding-top: 12px
-    padding-bottom: 12px
-  &.editing .v-list__tile
-    height: 48px
+.todo-item {
+  .v-list__tile {
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  &.editing .v-list__tile {
+    height: 48px;
+  }
+}
 </style>

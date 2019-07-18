@@ -1,69 +1,118 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { HTTP } from "./http-common";
 
 Vue.use(Vuex)
 
-const STORAGE_KEY = 'vuetify-todos'
-
 const state = {
-  todos: JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]')
+  todos: '[]',
+  errorMsg: ''
 }
 
 const mutations = {
+  loadTodos(state, todos) {
+    state.todos = todos
+  },
   addTodo(state, todo) {
     state.todos.push(todo)
   },
   removeTodo(state, todo) {
     state.todos.splice(state.todos.indexOf(todo), 1)
   },
-  editTodo(state, { todo, text = todo.text, done = todo.done }) {
-    todo.text = text
-    todo.done = done
+  editTodo(state, { todo, title = todo.title, completed = todo.completed }) {
+    todo.title = title
+    todo.completed = completed
+  },
+  populateError(state, errorMsg) {
+    state.errorMsg = errorMsg
   }
 }
 
 const actions = {
-  addTodo({ commit }, text) {
-    commit('addTodo', {
-      uid: Date.now(),
-      text,
-      done: false
-    })
+  loadTodos({ commit }) {
+    HTTP
+      .get('/todos')
+      .then(r => {
+        commit('loadTodos', r.data)
+      })
+      .catch(e => {
+        populateError(commit,e)
+      })
+  },
+  addTodo({ commit }, title) {
+    HTTP
+      .post('/todos', { title })
+      .then(r => {
+        commit('addTodo', r.data)
+      })
+      .catch(e => {
+        populateError(commit,e)
+      })
   },
   removeTodo({ commit }, todo) {
-    commit('removeTodo', todo)
+    HTTP
+      .delete('/todos/' + todo.id)
+      .then(
+        commit('removeTodo', todo)
+      )
+      .catch(e => {
+        populateError(commit,e)
+      })
   },
   toggleTodo({ commit }, todo) {
-    commit('editTodo', { todo, done: !todo.done })
+    HTTP
+      .put('/todos/' + todo.id, todo)
+      .then(
+        commit('editTodo', { todo, completed: !todo.completed })
+      )
+      .catch(e => {
+        populateError(commit,e)
+      })
   },
   editTodo({ commit }, { todo, value }) {
-    commit('editTodo', { todo, text: value })
+    HTTP
+      .put('/todos/' + todo.id, todo)
+      .then(
+        commit('editTodo', { todo, title: value })
+      )
+      .catch(e => {
+        populateError(commit,e)
+      })
   },
-  toggleAll({ state, commit }, done) {
+  toggleAll({ state, commit }, completed) {
     state.todos.forEach((todo) => {
-      commit('editTodo', { todo, done })
+      HTTP
+        .put('/todos/' + todo.id, todo)
+        .then(
+          commit('editTodo', { todo, completed: completed })
+        )
+        .catch(e => {
+          populateError(commit,e)
+        })
     })
   },
   clearCompleted({ state, commit }) {
-    state.todos.filter(todo => todo.done)
+    state.todos.filter(todo => todo.completed)
       .forEach(todo => {
-        commit('removeTodo', todo)
+        HTTP
+          .delete('/todos/' + todo.id)
+          .then(
+            commit('removeTodo', todo)
+          )
+          .catch(e => {
+            populateError(commit,e)
+          })
       })
   }
 }
 
-const plugins = [store => {
-  store.subscribe((mutation, { todos }) => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
-  })
-}]
+function populateError(commit, errorMsg) {
+  commit('populateError', errorMsg)
+  setTimeout(() => commit('populateError', ''), 5000)
+}
 
 export default new Vuex.Store({
   state,
   mutations,
-  actions,
-  plugins
+  actions
 })
-
-// Mutations must be synchronous
-// Actions can contain asynchronous operations (API), call API then commit mutation. Promises

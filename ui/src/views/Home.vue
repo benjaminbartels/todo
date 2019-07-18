@@ -3,6 +3,7 @@
     <v-flex text-xs-center>
       <!-- header -->
       <h1 class="primary--text display-3 font-weight-medium my-3">TODOS</h1>
+      <h3 class="error my-3" v-show="errorMessage != ''">{{errorMessage}}</h3>
       <v-card>
         <v-list class="pa-0">
           <v-list-tile>
@@ -13,10 +14,7 @@
                 color="primary"
                 v-if="todos.length > 0"
               ></v-checkbox>
-              <v-icon
-                color="primary"
-                v-else
-              >check</v-icon>
+              <v-icon color="primary" v-else>check</v-icon>
             </v-list-tile-action>
             <v-text-field
               :label="'New todo input'"
@@ -37,18 +35,11 @@
       </v-card>
       <!-- main -->
       <v-card class="mt-3" v-show="todos.length">
-        <v-progress-linear class="my-0" v-model="progressPercentage"/>
+        <v-progress-linear class="my-0" v-model="progressPercentage" />
         <v-card-actions class="px-3" v-show="todos.length">
-          <span class="primary--text">
-            {{ remaining }} {{ remaining | pluralize('item') }} left
-          </span>
+          <span class="primary--text">{{ remaining }} {{ remaining | pluralize('item') }} left</span>
           <v-spacer></v-spacer>
-          <v-btn-toggle
-            class="elevation-0"
-            mandatory
-            v-model="visibility"
-            v-show="todos.length"
-          >
+          <v-btn-toggle class="elevation-0" mandatory v-model="visibility" v-show="todos.length">
             <v-btn
               :key="key"
               :to="key"
@@ -58,18 +49,13 @@
               flat
               small
               v-for="(val, key) in filters"
-            >
-              {{ key | capitalize }}
-            </v-btn>
+            >{{ key | capitalize }}</v-btn>
           </v-btn-toggle>
         </v-card-actions>
         <v-list class="pa-0">
           <template v-for="todo in filteredTodos">
-            <v-divider :key="`${todo.uid}-divider`"></v-divider>
-            <TodoItem
-              :key="todo.uid"
-              :todo="todo"
-            />
+            <v-divider :key="`${todo.id}-divider`"></v-divider>
+            <TodoItem :key="todo.id" :todo="todo" />
           </template>
         </v-list>
       </v-card>
@@ -81,9 +67,7 @@
         depressed
         round
         v-show="todos.length > remaining"
-      >
-        Clear completed
-      </v-btn>
+      >Clear completed</v-btn>
       <!-- footer -->
       <footer-info></footer-info>
     </v-flex>
@@ -97,8 +81,8 @@ import FooterInfo from '@/components/FooterInfo.vue'
 
 const filters = {
   all: todos => todos,
-  active: todos => todos.filter(todo => !todo.done),
-  completed: todos => todos.filter(todo => todo.done)
+  active: todos => todos.filter(todo => !todo.completed),
+  completed: todos => todos.filter(todo => todo.completed)
 }
 
 export default {
@@ -114,22 +98,28 @@ export default {
       visibility: this.filter
     }
   },
+  created () {
+    this.$store.dispatch('loadTodos')
+  },
   computed: {
     todos () {
       return this.$store.state.todos
     },
     allChecked () {
-      return this.todos.every(todo => todo.done)
+      return this.todos.every(todo => todo.completed)
     },
     filteredTodos () {
       return filters[this.visibility](this.todos)
     },
     remaining () {
-      return this.todos.filter(todo => !todo.done).length
+      return this.todos.filter(todo => !todo.completed).length
     },
     progressPercentage () {
       const len = this.todos.length
       return ((len - this.remaining) * 100) / len
+    },
+    errorMessage () {
+      return this.$store.state.errorMsg
     }
   },
   methods: {
@@ -138,9 +128,9 @@ export default {
       'clearCompleted'
     ]),
     addTodo () {
-      const text = this.newTodo.trim()
-      if (text) {
-        this.$store.dispatch('addTodo', text)
+      const title = this.newTodo.trim()
+      if (title) {
+        this.$store.dispatch('addTodo', title)
       }
       this.newTodo = ''
     }
@@ -153,8 +143,7 @@ export default {
 </script>
 
 <style lang="stylus">
-h1
-  opacity: 0.3
-.v-text-field .v-input__slot
-  padding: 0 !important
+.v-text-field .v-input__slot {
+  padding: 0 !important;
+}
 </style>
