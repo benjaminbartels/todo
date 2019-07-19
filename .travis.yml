@@ -35,8 +35,6 @@ script:
 
 after_script:
   - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
-
-deploy:
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
   - terragrunt plan --terragrunt-working-dir infrastructure/terraform/dynamodb
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/dynamodb
