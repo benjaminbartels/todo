@@ -9,6 +9,7 @@ go:
   - 1.12
 
 install:
+  - pip install --user awscli
   - mkdir bin
   - export PATH=$PATH:$PWD/bin/
   - go get github.com/axw/gocov/gocov
@@ -31,6 +32,9 @@ script:
   - npm run build --prefix ui 
   - go test -coverprofile c.out ./...
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
+
+after_script:
+  - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
   - terragrunt plan --terragrunt-working-dir infrastructure/terraform/dynamodb
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/dynamodb
@@ -39,6 +43,4 @@ script:
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
   - SLS_DEBUG=* serverless create_domain --verbose
   - SLS_DEBUG=* serverless deploy --verbose
-
-after_script:
-  - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
+  - aws s3 sync ui/dist/ s3://www-all4days-net/
