@@ -7,16 +7,11 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+// Create Response generates an APIGatewayProxyResponse using the provided data and http code
 func CreateResponse(data interface{}, code int) (events.APIGatewayProxyResponse, error) {
 
 	r := events.APIGatewayProxyResponse{
 		StatusCode: code,
-	}
-
-	// No Content
-	if data == nil {
-		r.StatusCode = http.StatusNoContent
-		data = errorResponse{Err: http.StatusText(http.StatusNoContent)}
 	}
 
 	// Marshal into a JSON
@@ -29,12 +24,17 @@ func CreateResponse(data interface{}, code int) (events.APIGatewayProxyResponse,
 		}
 	}
 
+	r.Headers = make(map[string]string)
+	r.Headers["Access-Control-Allow-Origin"] = "*"
+	r.Headers["Access-Control-Allow-Credentials"] = "true"
+
 	r.Body = string(js)
 
 	return r, err
 }
 
-func CreateErrorResponse(code int, msg string) (events.APIGatewayProxyResponse, error) {
+// Create Error Response generates an APIGatewayProxyResponse using the provided message and http code
+func CreateErrorResponse(msg string, code int) (events.APIGatewayProxyResponse, error) {
 	return CreateResponse(errorResponse{Err: msg}, code)
 }
 

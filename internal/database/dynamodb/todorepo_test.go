@@ -12,7 +12,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-var testUUID = "a8a43435-20d8-4af2-8f94-f504aff2c6f3"
+const testUUID = "a8a43435-20d8-4af2-8f94-f504aff2c6f3"
 
 func TestToDoRepo(t *testing.T) {
 	t.Run("GetToDoFound", testGetToDoFound)
@@ -29,7 +29,7 @@ func TestToDoRepo(t *testing.T) {
 
 func testGetToDoFound(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.GetItemFn = func(*awsdynamodb.GetItemInput) (*awsdynamodb.GetItemOutput, error) {
 
@@ -70,7 +70,7 @@ func testGetToDoFound(t *testing.T) {
 
 func testGetToDoNotFound(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.GetItemFn = func(*awsdynamodb.GetItemInput) (*awsdynamodb.GetItemOutput, error) {
 		return &awsdynamodb.GetItemOutput{
@@ -97,7 +97,7 @@ func testGetToDoNotFound(t *testing.T) {
 
 func testGetToDoError(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.GetItemFn = func(*awsdynamodb.GetItemInput) (*awsdynamodb.GetItemOutput, error) {
 		return nil, errors.New("DB Error")
@@ -118,7 +118,7 @@ func testGetToDoError(t *testing.T) {
 
 func testGetAllToDos(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.ScanFn = func(*awsdynamodb.ScanInput) (*awsdynamodb.ScanOutput, error) {
 
@@ -176,7 +176,7 @@ func testGetAllToDos(t *testing.T) {
 
 func testGetAllToDosError(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.ScanFn = func(*awsdynamodb.ScanInput) (*awsdynamodb.ScanOutput, error) {
 		return nil, errors.New("DB Error")
@@ -197,7 +197,7 @@ func testGetAllToDosError(t *testing.T) {
 
 func testCreateToDo(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.PutItemFn = func(input *awsdynamodb.PutItemInput) (*awsdynamodb.PutItemOutput, error) {
 
@@ -243,7 +243,7 @@ func testCreateToDo(t *testing.T) {
 
 func testCreateToDoError(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.PutItemFn = func(*awsdynamodb.PutItemInput) (*awsdynamodb.PutItemOutput, error) {
 		return nil, errors.New("DB Error")
@@ -268,7 +268,7 @@ func testUpdateToDo(t *testing.T) {
 
 	id := uuid.NewV4().String()
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.PutItemFn = func(input *awsdynamodb.PutItemInput) (*awsdynamodb.PutItemOutput, error) {
 
@@ -319,7 +319,7 @@ func testUpdateToDo(t *testing.T) {
 
 func testDeleteToDo(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.DeleteItemFn = func(input *awsdynamodb.DeleteItemInput) (*awsdynamodb.DeleteItemOutput, error) {
 
@@ -355,7 +355,7 @@ func testDeleteToDo(t *testing.T) {
 
 func testDeleteToDoError(t *testing.T) {
 
-	m := &dynamodb.DynamoDBClientMock{}
+	m := &dynamodb.ClientMock{}
 
 	m.DeleteItemFn = func(input *awsdynamodb.DeleteItemInput) (*awsdynamodb.DeleteItemOutput, error) {
 		return nil, errors.New("DB Error")

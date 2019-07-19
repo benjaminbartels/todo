@@ -31,7 +31,7 @@ func (h *handler) handle(req events.APIGatewayProxyRequest) (events.APIGatewayPr
 	case "DELETE":
 		return h.delete(req)
 	default:
-		return lambda.CreateErrorResponse(http.StatusMethodNotAllowed, fmt.Sprintf("%s not allowed", req.HTTPMethod))
+		return lambda.CreateErrorResponse(fmt.Sprintf("%s not allowed", req.HTTPMethod), http.StatusMethodNotAllowed)
 	}
 }
 
@@ -41,11 +41,11 @@ func (h *handler) get(req events.APIGatewayProxyRequest) (events.APIGatewayProxy
 
 		todo, err := h.repo.Get(id)
 		if err != nil {
-			return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+			return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 		}
 
 		if todo == nil {
-			return lambda.CreateErrorResponse(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+			return lambda.CreateErrorResponse(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 
 		return lambda.CreateResponse(todo, http.StatusOK)
@@ -54,7 +54,7 @@ func (h *handler) get(req events.APIGatewayProxyRequest) (events.APIGatewayProxy
 
 	todos, err := h.repo.GetAll()
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	return lambda.CreateResponse(todos, http.StatusOK)
@@ -65,16 +65,16 @@ func (h *handler) post(req events.APIGatewayProxyRequest) (events.APIGatewayProx
 
 	todo, err := parseToDo(req.Body)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	if todo.ID != "" {
-		return lambda.CreateErrorResponse(http.StatusBadRequest, "ID is required")
+		return lambda.CreateErrorResponse("ID is required", http.StatusBadRequest)
 	}
 
 	err = h.repo.Save(&todo)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 	return lambda.CreateResponse(todo, http.StatusOK)
 }
@@ -83,30 +83,30 @@ func (h *handler) put(req events.APIGatewayProxyRequest) (events.APIGatewayProxy
 
 	id, ok := req.PathParameters["id"]
 	if !ok {
-		return lambda.CreateErrorResponse(http.StatusBadRequest, "ID is required")
+		return lambda.CreateErrorResponse("ID is required", http.StatusBadRequest)
 	}
 
 	t, err := h.repo.Get(id)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	if t == nil {
-		return lambda.CreateErrorResponse(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+		return lambda.CreateErrorResponse(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
 
 	todo, err := parseToDo(req.Body)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	if id != todo.ID {
-		return lambda.CreateErrorResponse(http.StatusBadRequest, "ID in body does not match ID in path")
+		return lambda.CreateErrorResponse("ID in body does not match ID in path", http.StatusBadRequest)
 	}
 
 	err = h.repo.Save(&todo)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 	return lambda.CreateResponse(todo, http.StatusOK)
 }
@@ -116,20 +116,20 @@ func (h *handler) delete(req events.APIGatewayProxyRequest) (events.APIGatewayPr
 	id, ok := req.PathParameters["id"]
 
 	if !ok {
-		return lambda.CreateErrorResponse(http.StatusBadRequest, "ID is required")
+		return lambda.CreateErrorResponse("ID is required", http.StatusBadRequest)
 	}
 
 	t, err := h.repo.Get(id)
 	if err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	if t == nil {
-		return lambda.CreateErrorResponse(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+		return lambda.CreateErrorResponse(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
 
 	if err := h.repo.Delete(id); err != nil {
-		return lambda.CreateErrorResponse(http.StatusInternalServerError, err.Error())
+		return lambda.CreateErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 
 	return lambda.CreateResponse(nil, http.StatusOK)
