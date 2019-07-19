@@ -20,9 +20,10 @@ install:
   - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./bin/terragrunt
   - chmod +x ./bin/terragrunt
   - npm install -g serverless
-  - npm install -g serverless-domain-manager
-  - npm install -g serverless-s3-sync
-  - npm install --prefix ui 
+  - serverless plugin install --name serverless-domain-manager
+  - serverless plugin install --name serverless-s3-sync
+  - npm install --prefix ui
+  
 before_script:
   - ./cc-test-reporter before-build
 
