@@ -22,13 +22,13 @@ install:
   - npm install -g serverless
   - npm install -g serverless-domain-manager
   - npm install -g serverless-s3-sync
+  - cd ./ui && npm install
 
 before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - cd ui && npm install
-  - cd ui && npm run build
+  - cd ./ui && npm run build
   - go test -coverprofile c.out ./...
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
