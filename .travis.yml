@@ -36,8 +36,8 @@ script:
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/iam
   - terragrunt plan --terragrunt-working-dir infrastructure/terraform/iam
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
-  - sls create_domain --verbose
-  - sls deploy --verbose
+  - SLS_DEBUG=* sls create_domain --verbose
+  - SLS_DEBUG=* sls deploy --verbose
 
 after_script:
   - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
