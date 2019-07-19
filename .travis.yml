@@ -39,6 +39,7 @@ script:
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
   - SLS_DEBUG=* serverless create_domain --verbose
   - SLS_DEBUG=* serverless deploy --verbose
+  - aws s3 sync ui/dist/ s3://www-all4days-net/
 
 after_script:
   - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
