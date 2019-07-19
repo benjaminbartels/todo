@@ -1,4 +1,4 @@
-package dynamodb
+package dynamodb_test
 
 import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -40,4 +40,5 @@ func (m *ClientMock) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOut
 func (m *ClientMock) DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
 	m.DeleteItemInvoked = true
 	return m.DeleteItemFn(input)
+	
 }
