@@ -20,11 +20,14 @@ install:
   - curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.19.8/terragrunt_linux_amd64 > ./bin/terragrunt
   - chmod +x ./bin/terragrunt
   - npm install -g serverless
+  - npm install -g serverless-domain-manager
+  - npm install -g serverless-s3-sync
 
 before_script:
   - ./cc-test-reporter before-build
 
 script:
+  - cd ui && npm run build
   - go test -coverprofile c.out ./...
   - env GOOS=linux go build -ldflags="-s -w" -o bin/todos internal/lambda/todos/main.go
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/dynamodb
@@ -33,6 +36,7 @@ script:
   - terragrunt get --terragrunt-working-dir infrastructure/terraform/iam
   - terragrunt plan --terragrunt-working-dir infrastructure/terraform/iam
   - terragrunt apply --terragrunt-working-dir infrastructure/terraform/iam
+  - sls create_domain --verbose
   - sls deploy --verbose
 
 after_script:
