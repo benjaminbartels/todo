@@ -40,5 +40,5 @@ func (m *ClientMock) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOut
 func (m *ClientMock) DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
 	m.DeleteItemInvoked = true
 	return m.DeleteItemFn(input)
-	
+
 }
