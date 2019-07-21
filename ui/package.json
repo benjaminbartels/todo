@@ -1,5 +1,10 @@
 {
   "name": "ui",
+  "description": "UI for ToDO application",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benjaminbartels/todo.git"
+  },
   "version": "0.1.0",
   "private": true,
   "scripts": {
