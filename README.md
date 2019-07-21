@@ -15,7 +15,7 @@ Simple ToDo App demonstrating the use of the following stack:
 
 ## Backend
 
-- API hosted using AWS API Gateway with a Lambda function written in Go which 
+- API hosted using AWS API Gateway with a Lambda function written in Go
 - Lambda function queries a DynamoDB table
 
 ## CI/CD
